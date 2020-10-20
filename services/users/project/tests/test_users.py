@@ -138,5 +138,41 @@ class TestUserService(BaseTestCase):
             'luciariquelme51@gmail.com', data['data']['users'][1]['email'])
             self.assertIn('success', data['status'])
 
+def test_main_no_users(self):
+    """Asegurando que la ruta principal se comporte correctamente cuando no se 
+    hayan agregado usuarios a la base de datos."""
+
+    response = self.client.get('/')
+    self.assertEqual(response.status_code, 200)
+    self.assertIn(b'All Users', response.data)
+    self.assertIn(b'<p>No users!</p>', response.data)
+
+def test_main_with_users(self):
+    """Asegurando que la ruta principal se comporte correctamente cuando se
+    hayan agregado usuarios a la base de datos."""
+
+    add_user('nicolegg', 'estefannygarcia@upeu.edu.pe')
+    add_user('Noluccia', 'luciariquelme51@gmail.com')
+    with self.client:
+        response = self.client.get('/')
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b'All Users', response.data)
+        self.assertNotIn(b'<p>No users!</p>', response.data)
+        self.assertIn(b'nicolegg', response.data)
+        self.assertIn(b'Noluccia', response.data)
+
+def test_main_add_user(self):
+    """
+   Asegurando que se pueda agregar un nuevo usuario a la base de datos mediante 
+   una solicitud POST. 
+    """
+    with self.client:
+        response = self.client.post(
+            '/',
+            data=dict(username='normariquelme', email='normariquelme@upeu.edu.pe'),
+            follow_redirects=True
+        )
+        self.assertEqual(response.status_code, 200)
+
 if __name__ == '__main__':
     unittest.main()
