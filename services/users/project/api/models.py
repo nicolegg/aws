@@ -23,7 +23,7 @@ class User(db.Model):
             'email': self.email,
             'active': self.active
         }
-    
+
     def __init__(self, username, email):
         self.username = username
         self.email = email

@@ -8,11 +8,13 @@ from project.tests.base import BaseTestCase
 from project import db
 from project.api.models import User
 
+
 def add_user(username, email):
     user = User(username=username, email=email)
     db.session.add(user)
     db.session.commit()
     return user
+
 
 class TestUserService(BaseTestCase):
     """Pruebas para el servicio de usuarios."""
@@ -31,18 +33,20 @@ class TestUserService(BaseTestCase):
             response = self.client.post(
                 '/users',
                 data=json.dumps(
-                {'username': 'nicolegg',
-                'email': 'estefannygarcia@upeu.edu.pe'}
+                    {'username': 'nicolegg',
+                     'email': 'estefannygarcia@upeu.edu.pe'}
                 ),
                 content_type='application/json',
             )
             data = json.loads(response.data.decode())
             self.assertEqual(response.status_code, 201)
-            self.assertIn('estefannygarcia@upeu.edu.pe was added!', data['message'])
+            self.assertIn(
+                'estefannygarcia@upeu.edu.pe was added!', data['message'])
             self.assertIn('success', data['status'])
 
     def test_add_user_invalid_json(self):
-        """Asegurese de que se produzca un error si el objeto JSON esta vacio."""
+        """Asegurese de que se produzca un error
+si el objeto JSON esta vacio."""
         with self.client:
             response = self.client.post(
                 '/users',
@@ -55,7 +59,8 @@ class TestUserService(BaseTestCase):
             self.assertIn('fail', data['status'])
 
     def test_add_user_invalid_json_keys(self):
-        """Asegurese de que se produzca un error si el objeto JSON no tiene una clave de nombre de usuario. """
+        """Asegurese de que se produzca un error
+        si el objeto JSON no tiene una clave de nombre de usuario. """
         with self.client:
             response = self.client.post(
                 '/users',
@@ -68,13 +73,14 @@ class TestUserService(BaseTestCase):
             self.assertIn('fail', data['status'])
 
     def test_add_user_duplicate_email(self):
-        """ Asegurese de que se arroje un error si el correo electronico ya existe."""
+        """ Asegurese de que se arroje un error
+        si el correo electronico ya existe."""
         with self.client:
             self.client.post(
                 '/users',
                 data=json.dumps(
                     {'username': 'nicolegg',
-                    'email': 'estefannygarcia@upeu.edu.pe'}
+                     'email': 'estefannygarcia@upeu.edu.pe'}
                 ),
                 content_type='application/json',
             )
@@ -82,7 +88,7 @@ class TestUserService(BaseTestCase):
                 '/users',
                 data=json.dumps(
                     {'username': 'nicolegg',
-                    'email': 'estefannygarcia@upeu.edu.pe'}
+                     'email': 'estefannygarcia@upeu.edu.pe'}
                 ),
                 content_type='application/json',
             )
@@ -101,7 +107,6 @@ class TestUserService(BaseTestCase):
             self.assertIn('nicolegg', data['data']['username'])
             self.assertIn('estefannygarcia@upeu.edu.pe', data['data']['email'])
             self.assertIn('success', data['status'])
-       
 
     def test_single_user_no_id(self):
         """Asegurese de que se produzca un error si no se proporciona un id."""
@@ -131,48 +136,55 @@ class TestUserService(BaseTestCase):
             self.assertEqual(response.status_code, 200)
             self.assertEqual(len(data['data']['users']), 2)
             self.assertIn('nicolegg', data['data']['users'][0]['username'])
-            self.assertIn(
-            'estefannygarcia@upeu.edu.pe', data['data']['users'][0]['email'])
+            self.assertIn('estefannygarcia@upeu.edu.pe', data[
+                'data']['users'][0]['email'])
             self.assertIn('Noluccia', data['data']['users'][1]['username'])
             self.assertIn(
-            'luciariquelme51@gmail.com', data['data']['users'][1]['email'])
+                'luciariquelme51@gmail.com', data['data']['users'][1]['email'])
             self.assertIn('success', data['status'])
 
-def test_main_no_users(self):
-    """Asegurando que la ruta principal se comporte correctamente cuando no se 
-    hayan agregado usuarios a la base de datos."""
 
-    response = self.client.get('/')
-    self.assertEqual(response.status_code, 200)
-    self.assertIn(b'All Users', response.data)
-    self.assertIn(b'<p>No users!</p>', response.data)
+    def test_main_no_users(self):
+        """Asegurando que la ruta principal se comporte
+        correctamente cuando no se
+        hayan agregado usuarios a la base de datos."""
 
-def test_main_with_users(self):
-    """Asegurando que la ruta principal se comporte correctamente cuando se
-    hayan agregado usuarios a la base de datos."""
+                response = self.client.get('/')
+                self.assertEqual(response.status_code, 200)
+                self.assertIn(b'All Users', response.data)
+                self.assertIn(b'<p>No users!</p>', response.data)
 
-    add_user('nicolegg', 'estefannygarcia@upeu.edu.pe')
-    add_user('Noluccia', 'luciariquelme51@gmail.com')
-    with self.client:
-        response = self.client.get('/')
-        self.assertEqual(response.status_code, 200)
-        self.assertIn(b'All Users', response.data)
-        self.assertNotIn(b'<p>No users!</p>', response.data)
-        self.assertIn(b'nicolegg', response.data)
-        self.assertIn(b'Noluccia', response.data)
 
-def test_main_add_user(self):
-    """
-   Asegurando que se pueda agregar un nuevo usuario a la base de datos mediante 
-   una solicitud POST. 
-    """
-    with self.client:
-        response = self.client.post(
-            '/',
-            data=dict(username='normariquelme', email='normariquelme@upeu.edu.pe'),
-            follow_redirects=True
-        )
-        self.assertEqual(response.status_code, 200)
+    def test_main_with_users(self):
+        """Asegurando que la ruta principal se 
+        comporte correctamente cuando se
+        hayan agregado usuarios a la base de datos."""
+        add_user('nicolegg', 'estefannygarcia@upeu.edu.pe')
+        add_user('Noluccia', 'luciariquelme51@gmail.com')
+        with self.client:
+                response = self.client.get('/')
+                self.assertEqual(response.status_code, 200)
+                self.assertIn(b'All Users', response.data)
+                self.assertNotIn(b'<p>No users!</p>', response.data)
+                self.assertIn(b'nicolegg', response.data)
+                self.assertIn(b'Noluccia', response.data)
+
+
+    def test_main_add_user(self):
+        """
+        Asegurando que se pueda agregar un nuevo usuario
+        a la base de datos mediante
+        una solicitud POST.
+        """
+        with self.client:
+                response = self.client.post(
+                    '/',
+                    data=dict(
+                        username='normariquelme', email='normariquelme@upeu.edu.pe'),
+                    follow_redirects=True
+                )
+                self.assertEqual(response.status_code, 200)
+
 
 if __name__ == '__main__':
     unittest.main()
