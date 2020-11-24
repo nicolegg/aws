@@ -10,9 +10,9 @@ ENV PATH /usr/src/app/node_modules/.bin:$PATH
 # Instalando y haciendo caché a las dependencias de la app
 COPY package.json /usr/src/app/package.json
 COPY package-lock.json /usr/src/app/package-lock.json
+RUN npm config set unsafe-perm true
 RUN npm ci
 RUN npm install react-scripts@2.1.8 -g --silent
-RUN npm config set unsafe-perm true
 
 # iniciando la app
 CMD ["npm", "start"]
