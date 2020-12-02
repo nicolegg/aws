@@ -59,7 +59,7 @@ class TestUserModel(BaseTestCase):
         user = add_user('justatest', 'test@test.com', 'test')
         auth_token = user.encode_auth_token(user.id)
         self.assertTrue(isinstance(auth_token, bytes))
-        self.assertEqual(User.decode_auth_token(auth_token), user.id)    
+        self.assertEqual(User.decode_auth_token(auth_token), user.id)
 
 
 if __name__ == '__main__':
