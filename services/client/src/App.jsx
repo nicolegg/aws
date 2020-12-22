@@ -25,6 +25,8 @@ class App extends Component {
     };
     this.addUser = this.addUser.bind(this);
     this.handleChange = this.handleChange.bind(this);
+    this.handleUserFormSubmit = this.handleUserFormSubmit.bind(this);
+    this.handleFormChange= this.handleFormChange.bind(this);
   };
   componentDidMount() {
     this.getUsers();
@@ -52,6 +54,29 @@ class App extends Component {
     obj[event.target.name] = event.target.value;
     this.setState(obj);
   };
+  handleUserFormSubmit(event) {
+    event.preventDefault();
+    const formType = window.location.href.split('/').reverse()[0];
+    let data = {
+      email: this.state.formData.email,
+      password: this.state.formData.password,
+    };
+    if (formType === 'register') {
+      data.username = this.state.formData.username;
+    }
+    const url = `${process.env.REACT_APP_USERS_SERVICE_URL}/auth/${formType}`
+    axios.post(url, data)
+    .then((res) => {
+      console.log(res.data);
+    })
+    .catch((err) => { console.log(err); });
+  };
+  handleFormChange(event) {
+    const obj = this.state.formData;
+    obj[event.target.name] = event.target.value;
+    this.setState(obj);
+    //console.log(this.state.formData);
+  };
   render() {
     return (
     <div>
@@ -63,6 +88,22 @@ class App extends Component {
               <br/>
               {/* new */}
               <Switch>
+                <Route exact path='/register' render={() => (
+                  <Form
+                    formType={'Register'}
+                    formData={this.state.formData}
+                    handleUserFormSubmit={this.handleUserFormSubmit}
+                    handleFormChange={this.handleFormChange}  // nuevo
+                  />
+                )} />
+                <Route exact path='/login' render={() => (
+                  <Form
+                    formType={'Login'}
+                    formData={this.state.formData}
+                    handleUserFormSubmit={this.handleUserFormSubmit}
+                    handleFormChange={this.handleFormChange}  // nuevo
+                  />
+                )} />
                 <Route exact path='/' render={() => (
                   <div>
                     <h1 className="title is-1">All Users</h1>
@@ -78,26 +119,14 @@ class App extends Component {
                   </div>
                 )} />
                 <Route exact path='/about' component={About}/>
-                <Route exact path='/register' render={() => (
-                  <Form
-                    formType={'Register'}
-                    formData={this.state.formData}
-                  />
-                )} />
-                <Route exact path='/login' render={() => (
-                  <Form
-                    formType={'Login'}
-                    formData={this.state.formData}
-                  />
-                )} />
               </Switch>
             </div>
           </div>
         </div>
       </section>
     </div> 
-  )
-}
+   )
+  }
 };
 
 export default App;
